@@ -167,3 +167,27 @@ if (not a == 'zero' and not a == 'one' and not a == 'two' and not a == 'three' a
     print("I am not able to answer this question. Check your input.")
 
 print("Thanks for using this calculator, goodbye :)")
+
+
+# Vamos a cambiar este código espaguetti:
+def dumb_calculator():
+    print('Welcome to this calculator!')
+    print('It can add and subtract whole numbers from zero to five')
+    a = input('Please choose your first number (zero to five): ')
+    b = input('What do you want to do? plus or minus: ')
+    c = input('Please choose your second number (zero to five): ')
+    string_int_dict={"zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5}
+    if (not a == 'zero' and not a == 'one' and not a == 'two' and not a == 'three' and not a == 'four' and not a == 'five') or (not c == 'zero' and not c == 'one' and not c == 'two' and not c == 'three' and not c == 'four' and not c == 'five') or (not b == 'plus' and not b == 'minus'):
+        return print("I am not able to answer this question. Check your input.")
+    elif b=="plus":
+        a=string_int_dict[a]
+        c=string_int_dict[c]
+        sum_calc=a+c
+        return print(sum_calc, "\nThanks for using this calculator, goodbye :)")
+    elif b=="minus":
+        a=string_int_dict[a]
+        c=string_int_dict[c]
+        reduce_calc=a-c
+        return print(reduce_calc, "\nThanks for using this calculator, goodbye :)")
+
+dumb_calculator()
