@@ -61,3 +61,37 @@ FROM (
 GROUP BY q2.au_id
 ORDER BY Profits DESC
 LIMIT 3
+
+
+
+-- Challenge 2: same exercise with different method - temporary tables
+
+CREATE TEMPORARY TABLE royalty_and_advance AS
+SELECT
+		titles.title_id,
+		authors.au_id,
+		titles.advance * titleauthor.royaltyper / 100 AS [Advance],
+		titles.price * sales.qty * titles.royalty / 100 * titleauthor.royaltyper / 100 AS [Sales_royality]
+FROM authors
+		INNER JOIN titleauthor ON titleauthor.au_id = authors.au_id
+		INNER JOIN titles ON titles.title_id = titleauthor.title_id
+		INNER JOIN sales ON sales.title_id = titleauthor.title_id;
+
+		
+CREATE TEMPORARY TABLE total_royalty_and_advance AS
+SELECT
+    	title_id,
+    	au_id,
+    	SUM(Advance) AS [Total_Advance],
+    	SUM(Sales_royality) AS [Total_Sales_Royalties]
+FROM royalty_and_advance
+GROUP BY title_id, au_id;
+
+
+SELECT
+		au_id,
+		SUM(Total_Advance + Total_Sales_Royalties) AS Profits
+FROM total_royalty_and_advance
+GROUP BY au_id
+ORDER BY Profits DESC
+LIMIT 3;
