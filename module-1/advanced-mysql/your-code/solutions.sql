@@ -1,1 +1,63 @@
 -- Write your queries bellow
+-- Challenge 1
+
+--- Step 1: Calculate the royalty of each sale for each author and the advance for each author and publication
+
+SELECT
+		titles.title_id,
+		authors.au_id,
+		titles.advance * titleauthor.royaltyper / 100 AS [Advance],
+		titles.price * sales.qty * titles.royalty / 100 * titleauthor.royaltyper / 100 AS [Sales_royality]
+FROM authors
+		INNER JOIN titleauthor ON titleauthor.au_id = authors.au_id
+		INNER JOIN titles ON titles.title_id = titleauthor.title_id
+		INNER JOIN sales ON sales.title_id = titleauthor.title_id
+        
+        
+--- Step 2: Aggregate the total royalties for each title and author
+
+SELECT
+    	title_id,
+    	au_id,
+    	SUM(Advance) AS [Total_Advance],
+    	SUM(Sales_royality) AS [Total_Sales_Royalties]
+FROM (
+    SELECT
+        titles.title_id,
+        authors.au_id,
+        titles.advance * titleauthor.royaltyper / 100 AS [Advance],
+        titles.price * sales.qty * titles.royalty / 100 * titleauthor.royaltyper / 100 AS [Sales_royality]
+    FROM authors
+        INNER JOIN titleauthor ON titleauthor.au_id = authors.au_id
+        INNER JOIN titles ON titles.title_id = titleauthor.title_id
+        INNER JOIN sales ON sales.title_id = titleauthor.title_id
+) AS Subquery
+GROUP BY title_id, au_id
+
+
+--- Step 3: Calculate the total profits of each author
+
+SELECT
+		q2.au_id,
+		SUM(q2.Total_Advance + q2.Total_Sales_Royalties) AS Profits
+FROM (
+	SELECT
+    	q1.title_id,
+    	q1.au_id,
+    	SUM(q1.Advance) AS [Total_Advance],
+    	SUM(q1.Sales_royality) AS [Total_Sales_Royalties]
+	FROM (
+    	SELECT
+        	titles.title_id,
+        	authors.au_id,
+        	titles.advance * titleauthor.royaltyper / 100 AS [Advance],
+        	titles.price * sales.qty * titles.royalty / 100 * titleauthor.royaltyper / 100 AS [Sales_royality]
+    	FROM authors
+        	INNER JOIN titleauthor ON titleauthor.au_id = authors.au_id
+        	INNER JOIN titles ON titles.title_id = titleauthor.title_id
+        	INNER JOIN sales ON sales.title_id = titleauthor.title_id
+	) as q1
+	GROUP BY q1.title_id, q1.au_id) AS q2
+GROUP BY q2.au_id
+ORDER BY Profits DESC
+LIMIT 3
